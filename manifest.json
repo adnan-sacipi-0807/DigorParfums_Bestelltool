@@ -1,0 +1,9 @@
+{
+  "name": "DigorParfums Bestelltool",
+  "short_name": "DigorParfums",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "description": "Bestelltool für DigorParfums"
+}
