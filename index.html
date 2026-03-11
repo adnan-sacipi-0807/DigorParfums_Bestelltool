@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>DigorParfums Bestelltool</title>
+  <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png"> href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', -apple-system, sans-serif; background: #0a0a0a; color: #eee; min-height: 100vh; }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type=number] { -moz-appearance: textfield; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0a0a0a; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    .app { max-width: 480px; margin: 0 auto; min-height: 100vh; }
+    .header { padding: 16px 16px 8px; background: linear-gradient(135deg, #0a0a0a 0%, #151008 100%); }
+    .header h1 { font-size: 18px; font-weight: 700; color: #c9a96e; letter-spacing: 1px; margin: 0; }
+    .header p { font-size: 11px; color: #666; letter-spacing: 0.5px; margin: 2px 0 0; }
+    .tabs { display: flex; border-bottom: 1px solid #2a2a2a; background: #0a0a0a; position: sticky; top: 0; z-index: 10; }
+    .tab { flex: 1; padding: 12px 4px; border: none; background: transparent; color: #666; font-size: 12px; cursor: pointer; font-family: inherit; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab.active { background: #1a1a1a; color: #c9a96e; font-weight: 700; border-bottom-color: #c9a96e; }
+    .content { padding: 16px; }
+    .stats { display: flex; gap: 8px; margin-bottom: 16px; }
+    .stat { flex: 1; background: #111; border-radius: 8px; padding: 12px; text-align: center; }
+    .stat-num { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 11px; color: #666; }
+    .search-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+    .search-input { flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid #333; background: #111; color: #eee; font-size: 13px; font-family: inherit; }
+    .btn { padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 12px; transition: opacity 0.2s; }
+    .btn:active { opacity: 0.7; }
+    .btn-gold { border: 1px solid #c9a96e44; background: #1a1508; color: #c9a96e; }
+    .btn-red { border: 1px solid #ef444444; background: #450a0a; color: #ef4444; }
+    .btn-green { background: #25D366; color: #fff; }
+    .btn-ghost { border: 1px solid #333; background: transparent; color: #666; }
+    .chips { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .chip { padding: 4px 12px; border-radius: 20px; border: 1px solid #333; background: transparent; color: #666; font-size: 12px; cursor: pointer; font-family: inherit; }
+    .chip.active { border-color: var(--c); background: color-mix(in srgb, var(--c) 15%, transparent); color: var(--c); }
+    .product-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #111; border-radius: 8px; margin-bottom: 6px; }
+    .product-name { font-size: 13px; font-weight: 600; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .product-sub { font-size: 11px; color: #555; margin-top: 1px; }
+    .product-inspo { color: #887755; }
+    .stock-btn { width: 28px; height: 28px; border-radius: 4px; border: 1px solid #333; background: #1a1a1a; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+    .stock-val { width: 36px; text-align: center; font-size: 16px; font-weight: 700; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
+    .badge-sm { padding: 1px 6px; font-size: 10px; }
+    .order-card { background: #111; border-radius: 8px; overflow: hidden; border: 1px solid #222; margin-bottom: 8px; }
+    .order-header { display: flex; align-items: center; gap: 10px; padding: 12px; cursor: pointer; }
+    .order-body { border-top: 1px solid #222; padding: 8px 12px 12px; }
+    .order-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .login-box { max-width: 320px; margin: 60px auto; padding: 32px; text-align: center; }
+    .login-box h2 { color: #c9a96e; font-size: 20px; margin-bottom: 4px; }
+    .login-box p { color: #666; font-size: 12px; margin-bottom: 24px; }
+    .login-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: #eee; font-size: 14px; font-family: inherit; margin-bottom: 12px; }
+    .login-btn { width: 100%; padding: 14px; border-radius: 8px; border: none; background: #c9a96e; color: #000; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .login-error { color: #ef4444; font-size: 12px; margin-top: 8px; }
+    .preview-box { background: #0a0a0a; border-radius: 8px; border: 1px solid #2a2a2a; padding: 14px; margin-bottom: 12px; }
+    .preview-label { font-size: 11px; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .preview-text { font-size: 12px; color: #aaa; white-space: pre-wrap; line-height: 1.5; }
+    .cart-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #111; border-radius: 6px; cursor: pointer; margin-bottom: 4px; border: 1px solid transparent; }
+    .cart-item.selected { background: #1a1508; border-color: #c9a96e44; }
+    .checkbox { width: 20px; height: 20px; border-radius: 4px; border: 2px solid #444; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+    .checkbox.checked { border-color: #c9a96e; background: #c9a96e; color: #000; }
+    .qty-control { display: flex; align-items: center; gap: 4px; }
+    .qty-btn { width: 24px; height: 24px; border-radius: 4px; border: 1px solid #333; background: #1a1a1a; color: #999; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+    .qty-input { width: 40px; padding: 2px 4px; text-align: center; background: #222; border: 1px solid #444; border-radius: 4px; color: #c9a96e; font-size: 14px; font-weight: 700; font-family: inherit; }
+    .new-badge { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #c9a96e33; color: #c9a96e; font-weight: 700; }
+    .sortiment-badge { font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #22c55e22; color: #22c55e; font-weight: 700; }
+    .setting-label { font-size: 12px; color: #888; display: block; margin-bottom: 6px; }
+    .setting-input { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid #333; background: #111; color: #eee; font-size: 14px; font-family: inherit; }
+    .loading { height: 100vh; display: flex; align-items: center; justify-content: center; color: #c9a96e; font-size: 16px; }
+    .empty { text-align: center; padding: 40px 20px; color: #555; }
+    .min-edit { width: 36px; padding: 1px 4px; background: #222; border: 1px solid #c9a96e; border-radius: 3px; color: #eee; font-size: 11px; font-family: inherit; }
+    .min-click { cursor: pointer; border-bottom: 1px dashed #555; }
+    .view-toggle { display: flex; gap: 6px; margin-bottom: 12px; }
+    .view-btn { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid #333; background: transparent; color: #666; cursor: pointer; font-family: inherit; }
+    .view-btn.active { border-color: var(--c, #c9a96e)66; background: color-mix(in srgb, var(--c, #c9a96e) 15%, transparent); color: var(--c, #c9a96e); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<div id="app" class="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ═══════════════════════════════════════════
+// KONFIGURATION - Hier deine Supabase-Daten eintragen
+// ═══════════════════════════════════════════
+const SUPABASE_URL = 'https://ezleuwnbatrsvyxspmoj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bGV1d25iYXRyc3Z5eHNwbW9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjQyNzMsImV4cCI6MjA4ODgwMDI3M30.vYxquO8kB6YyG5jPdiO7R6zT1C8OpOHZEyNdZT1EsDA';
+// ═══════════════════════════════════════════
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+// ─── Supplier Catalog ───
+const CATALOG = [
+  {name:"GHOST",inspiration:"Kirke",category:"privée",inSortiment:true},
+  {name:"AïSHA",inspiration:"Création by Igor",category:"privée",inSortiment:true},
+  {name:"CORTEGA ROYAL",inspiration:"Bois d'Igor",category:"privée",inSortiment:true},
+  {name:"NIGHT AND DAY",inspiration:"Ambre Nuit Dior",category:"privée",inSortiment:true},
+  {name:"OUDY",inspiration:"Oud Wood Tom Ford",category:"privée",inSortiment:true},
+  {name:"NWAAR",inspiration:"Noir de Noir Tom Ford",category:"privée",inSortiment:true},
+  {name:"MEDELLIN",inspiration:"Tuscan Leather Tom Ford",category:"privée",inSortiment:true},
+  {name:"COPACABANA",inspiration:"Tobacco Vanille Tom Ford",category:"privée",inSortiment:true},
+  {name:"ROSE D'ORIENT",inspiration:"Rose d'Arabie Armani",category:"privée",inSortiment:true},
+  {name:"BOISE FRUITÉ",inspiration:"Silver Mountain Creed",category:"privée",inSortiment:true},
+  {name:"PEGAZ",inspiration:"Pegasus Parfums de Marly",category:"privée",inSortiment:true},
+  {name:"DJANGO BABOOYA",inspiration:"Bal d'Afrique Byredo",category:"privée",inSortiment:true},
+  {name:"MAGNOLIA",inspiration:"Velvet Oud D&G",category:"privée",inSortiment:true},
+  {name:"BLUE MAGIC",inspiration:"Création by Igor",category:"privée",inSortiment:true},
+  {name:"FLEUR GOURMANDE",inspiration:"Fantasya",category:"privée",inSortiment:true},
+  {name:"AïSHA GOLD EDITION",inspiration:"Création by Igor",category:"privée",inSortiment:true},
+  {name:"CORTEGA ROYAL 75 ML",inspiration:"Bois d'Igor",category:"privée",inSortiment:true},
+  {name:"BILLIE",inspiration:"Ilham SoOud",category:"privée",inSortiment:true},
+  {name:"BLACK IRISH",inspiration:"Création",category:"privée",inSortiment:true},
+  {name:"IRIS MYSTÈRE",inspiration:"Chanel N°5",category:"privée",inSortiment:true},
+  {name:"ICHLI BIDICH",inspiration:"Création",category:"privée",inSortiment:true},
+  {name:"AVTS",inspiration:"Création",category:"privée",inSortiment:true},
+  {name:"IGOR IN PARIS",inspiration:"Création by Igor",category:"privée",inSortiment:true},
+  {name:"MIRA",inspiration:"Création",category:"privée",inSortiment:true},
+  {name:"NECTAR SUBLIME",inspiration:"Création",category:"privée",inSortiment:true},
+  {name:"DJEDDAH",inspiration:"Création",category:"privée",inSortiment:true},
+  {name:"OUD عود",inspiration:"Création",category:"privée",inSortiment:true},
+  // Neue Düfte (nur im Katalog)
+  {name:"LOVE COCO",inspiration:"Création",category:"privée",isNew:true},
+  {name:"SPANISH LATTE",inspiration:"Création",category:"privée",isNew:true},
+  {name:"JUICY",inspiration:"Angel's Share Kilian",category:"privée",isNew:true},
+  {name:"MUSK SILK",inspiration:"Création",category:"privée",isNew:true},
+  {name:"U WANNA BE ME",inspiration:"Santal de Paris",category:"privée",isNew:true},
+  {name:"AMANDE DÉLICE",inspiration:"Fève Délicieuse",category:"privée",isNew:true},
+  {name:"MIDNIGHT LUV",inspiration:"Cargo de Nuit Prada",category:"privée",isNew:true},
+  {name:"GRIS / FOUR SEASON",inspiration:"Création",category:"privée",isNew:true},
+  {name:"OUD ISPAHAN",inspiration:"Oud Ispahan Dior",category:"privée",isNew:true},
+  {name:"SWEET DREAMS",inspiration:"Attrape-Rêves LV",category:"privée",isNew:true},
+  {name:"SUPER FLEUR",inspiration:"Suprême Bouquet YSL",category:"privée",isNew:true},
+  {name:"JUNGLE",inspiration:"Oud Maliki Chopard",category:"privée",isNew:true},
+  {name:"AVANTUS",inspiration:"Aventus Creed",category:"privée",isNew:true},
+  {name:"BLACK AOUD",inspiration:"Black Aoud Montale",category:"privée",isNew:true},
+  {name:"MUSKITOKO",inspiration:"Création",category:"privée",isNew:true},
+  {name:"MANCERA ROSE VANILLE",inspiration:"Roses Vanille Mancera",category:"privée",isNew:true},
+  {name:"SOLEIL DE DJEDDAH",inspiration:"Stéphane Humbert Lucas",category:"privée",isNew:true},
+  {name:"SAHARA",inspiration:"Sable d'Or",category:"privée",isNew:true},
+  // Nicht lieferbar
+  {name:"L'ÉLÉGANCE",inspiration:"Tuxedo YSL",category:"privée",notAvailable:true,inSortiment:true},
+  {name:"CRYSTAL 24 / 50 ML",inspiration:"Baccarat Rouge 540",category:"privée",notAvailable:true,inSortiment:true},
+  {name:"CRYSTAL 24 / 100 ML",inspiration:"Baccarat Rouge 540",category:"privée",notAvailable:true,inSortiment:true},
+  {name:"CRYSTAL / 75 ML",inspiration:"Baccarat Rouge 540",category:"privée",notAvailable:true,inSortiment:true},
+  {name:"COMME UN ÉCLAT",inspiration:"Black Opium YSL",category:"femme",notAvailable:true,inSortiment:true},
+  // Homme (im Sortiment)
+  {name:"23",inspiration:"La Nuit de l'Homme YSL",category:"homme",inSortiment:true},
+  {name:"BÉLIZE",inspiration:"Acqua di Gio",category:"homme",inSortiment:true},
+  {name:"NARUTO",inspiration:"Body Kouros YSL",category:"homme",inSortiment:true},
+  {name:"HDI",inspiration:"Dior Homme Intense",category:"homme",inSortiment:true},
+  {name:"ORCHID",inspiration:"Black Orchid Tom Ford",category:"homme",inSortiment:true},
+  // Homme (neu)
+  {name:"COULEUR D'ÉBÈNE",inspiration:"Terre d'Hermès",category:"homme",isNew:true},
+  {name:"NUMÉRO 10",inspiration:"Invictus Paco Rabanne",category:"homme",isNew:true},
+  {name:"SKY'S THE LIMIT",inspiration:"Bottled Hugo Boss",category:"homme",isNew:true},
+  {name:"DUBAÏ MARINA",inspiration:"Kalemat",category:"homme",isNew:true},
+  {name:"CHAVEZ",inspiration:"Spicebomb Viktor&Rolf",category:"homme",isNew:true},
+  {name:"JUMEIRAH BEACH",inspiration:"Création by Igor",category:"homme",isNew:true},
+  // Femme (im Sortiment)
+  {name:"LOVE IT",inspiration:"J'adore Dior",category:"femme",inSortiment:true},
+  {name:"NORA",inspiration:"Sì Armani",category:"femme",inSortiment:true},
+  {name:"HAYAT INTENSE",inspiration:"La Petite Robe Noire Guerlain",category:"femme",inSortiment:true},
+  // Femme (neu)
+  {name:"PBLV",inspiration:"La Vie Est Belle Lancôme",category:"femme",isNew:true},
+  // Sprays (neu)
+  {name:"SPRAY AïSHA",inspiration:"Spray",category:"spray",isNew:true},
+  {name:"SPRAY FRESH",inspiration:"Spray",category:"spray",isNew:true},
+  {name:"SPRAY BLUE MAGIC",inspiration:"Spray",category:"spray",isNew:true},
+  {name:"SPRAY RED WINDOW",inspiration:"Spray",category:"spray",isNew:true},
+  {name:"SPRAY HOLY MOLY",inspiration:"Spray",category:"spray",isNew:true},
+  {name:"SPRAY COTTON VIRGO",inspiration:"Spray",category:"spray",isNew:true},
+];
+
+const CATEGORIES = {all:"Alle","privée":"Privée",homme:"Homme",femme:"Femme",spray:"Spray"};
+
+// ─── State ───
+let state = {
+  user: null,
+  products: [],
+  orders: [],
+  settings: {lieferant_name:"Les Parfums D'igor",lieferant_phone:"",default_min_stock:2},
+  tab: "dashboard",
+  filter: "all",
+  search: "",
+  editingMin: null,
+  cart: {},
+  sent: false,
+  expandedOrder: null,
+  katalogView: "new",
+  katalogCategory: "all",
+  katalogSearch: "",
+  loading: true,
+  loginEmail: "",
+  loginPassword: "",
+  loginError: "",
+  loginLoading: false,
+};
+
+function setState(patch) {
+  Object.assign(state, patch);
+  render();
+}
+
+// ─── Status Logic ───
+function getStatus(p) {
+  if (p.not_available) return {color:"#666",bg:"#1a1a1a",label:"Nicht lieferbar",order:5};
+  if (p.stock <= 0) return {color:"#dc2626",bg:"#7f1d1d",label:"Ausverkauft",order:1};
+  if (p.stock <= Math.floor(p.min_stock * 0.5)) return {color:"#ef4444",bg:"#450a0a",label:"Bestellen!",order:2};
+  if (p.stock <= p.min_stock) return {color:"#eab308",bg:"#422006",label:"Bald",order:3};
+  return {color:"#22c55e",bg:"#052e16",label:"OK",order:4};
+}
+
+function badge(s, small) {
+  return `<span class="badge ${small?'badge-sm':''}" style="color:${s.color};background:${s.bg};border:1px solid ${s.color}33">${s.label}</span>`;
+}
+
+// ─── CSV Parser ───
+function parseCSV(text) {
+  const lines = text.split("\n").filter(l=>l.trim());
+  if (lines.length < 2) return [];
+  const headers = parseRow(lines[0]).map(h=>h.replace(/"/g,"").toLowerCase().trim());
+  const titleIdx = headers.findIndex(h=>h==="title"||h==="product"||h==="produkt");
+  const handleIdx = headers.findIndex(h=>h==="handle");
+  const onHandIdx = headers.findIndex(h=>h.includes("on hand")&&h.includes("current"));
+  const availIdx = onHandIdx!==-1?onHandIdx:headers.findIndex(h=>h.includes("available")||h==="verfügbar");
+  if (titleIdx===-1&&handleIdx===-1) return [];
+  const products = new Map();
+  for (let i=1;i<lines.length;i++) {
+    const row = parseRow(lines[i]);
+    if (!row||row.length<2) continue;
+    const name = (titleIdx!==-1?row[titleIdx]:row[handleIdx]||"").trim().replace(/"/g,"");
+    if (!name||name.toLowerCase()==="refiller") continue;
+    const stock = Math.max(0, availIdx!==-1?parseInt(row[availIdx])||0:0);
+    const key = name.toUpperCase();
+    if (products.has(key)) products.get(key).stock+=stock;
+    else products.set(key,{name,stock});
+  }
+  return Array.from(products.values());
+}
+
+function parseRow(line) {
+  const r=[]; let c="",q=false;
+  for (let i=0;i<line.length;i++) {
+    if (line[i]==='"') q=!q;
+    else if (line[i]===","&&!q) {r.push(c.trim());c="";}
+    else c+=line[i];
+  }
+  r.push(c.trim()); return r;
+}
+
+// ─── Supabase Operations ───
+async function loadProducts() {
+  const {data} = await sb.from('products').select('*').order('name');
+  return data || [];
+}
+
+async function initCatalog(userId) {
+  const rows = CATALOG.map(p=>({
+    user_id: userId, name: p.name, inspiration: p.inspiration||"",
+    category: p.category||"privée", stock: 0, min_stock: 2,
+    in_sortiment: p.inSortiment||false, not_available: p.notAvailable||false,
+    is_new: p.isNew||false,
+  }));
+  // Insert in batches of 20
+  for (let i=0;i<rows.length;i+=20) {
+    await sb.from('products').insert(rows.slice(i,i+20));
+  }
+}
+
+async function updateProduct(id, fields) {
+  await sb.from('products').update(fields).eq('id', id);
+}
+
+async function loadOrders() {
+  const {data:orders} = await sb.from('orders').select('*').order('order_date',{ascending:false});
+  if (!orders||!orders.length) return [];
+  const ids = orders.map(o=>o.id);
+  const {data:items} = await sb.from('order_items').select('*').in('order_id', ids);
+  return orders.map(o=>({...o, items:(items||[]).filter(i=>i.order_id===o.id)}));
+}
+
+async function createOrder(userId, cartItems) {
+  const {data:order} = await sb.from('orders').insert({user_id:userId,status:'bestellt'}).select().single();
+  if (!order) return null;
+  const rows = cartItems.map(i=>({order_id:order.id,name:i.name,qty:i.orderQty}));
+  await sb.from('order_items').insert(rows);
+  return order;
+}
+
+async function updateOrderItem(itemId, fields) {
+  await sb.from('order_items').update(fields).eq('id', itemId);
+}
+
+async function updateOrder(orderId, fields) {
+  await sb.from('orders').update(fields).eq('id', orderId);
+}
+
+async function deleteOrder(orderId) {
+  await sb.from('orders').delete().eq('id', orderId);
+}
+
+async function loadSettings(userId) {
+  const {data} = await sb.from('settings').select('*').eq('user_id',userId).single();
+  return data;
+}
+
+async function saveSettings(userId, s) {
+  const {data:existing} = await sb.from('settings').select('id').eq('user_id',userId).single();
+  if (existing) await sb.from('settings').update(s).eq('user_id',userId);
+  else await sb.from('settings').insert({user_id:userId,...s});
+}
+
+// ─── WhatsApp ───
+function whatsappURL(phone, items) {
+  const d = new Date().toLocaleDateString("fr-FR");
+  let m = `Bonjour,\n\nNouvelle commande DigorParfums (${d}) :\n\n`;
+  items.forEach(i=>{m+=`• ${i.name} : ${i.orderQty} pcs\n`;});
+  m+=`\nTotal : ${items.reduce((s,i)=>s+i.orderQty,0)} pièces\n\nMerci beaucoup.\nCordialement`;
+  return `https://wa.me/${phone.replace(/[^0-9]/g,"")}?text=${encodeURIComponent(m)}`;
+}
+
+function previewMsg(items) {
+  const d = new Date().toLocaleDateString("fr-FR");
+  let m = `Bonjour,\n\nNouvelle commande DigorParfums (${d}) :\n\n`;
+  items.forEach(i=>{m+=`• ${i.name} : ${i.orderQty} pcs\n`;});
+  m+=`\nTotal : ${items.reduce((s,i)=>s+i.orderQty,0)} pièces\n\nMerci beaucoup.\nCordialement`;
+  return m;
+}
+
+// ─── Auth ───
+async function handleLogin() {
+  setState({loginLoading:true, loginError:""});
+  const {data,error} = await sb.auth.signInWithPassword({email:state.loginEmail,password:state.loginPassword});
+  if (error) {
+    // Try signup if user doesn't exist
+    if (error.message.includes("Invalid login")) {
+      const {data:d2,error:e2} = await sb.auth.signUp({email:state.loginEmail,password:state.loginPassword});
+      if (e2) { setState({loginError:e2.message,loginLoading:false}); return; }
+      if (d2.user) { await initApp(d2.user); return; }
+    }
+    setState({loginError:error.message,loginLoading:false}); return;
+  }
+  if (data.user) await initApp(data.user);
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  setState({user:null,products:[],orders:[],loading:false});
+}
+
+async function initApp(user) {
+  setState({user, loading:true});
+  let products = await loadProducts();
+  if (!products.length) {
+    await initCatalog(user.id);
+    products = await loadProducts();
+  }
+  const orders = await loadOrders();
+  const settings = await loadSettings(user.id);
+  setState({
+    products, orders, loading:false, loginLoading:false,
+    settings: settings || state.settings,
+  });
+}
+
+// ─── Event Handlers ───
+async function handleCSVImport(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const text = await file.text();
+  const parsed = parseCSV(text);
+  if (!parsed.length) { alert("Keine Produkte im CSV gefunden."); return; }
+  let count = 0;
+  for (const csv of parsed) {
+    const key = csv.name.toUpperCase();
+    const ex = state.products.find(p=>p.name.toUpperCase()===key);
+    if (ex) {
+      await updateProduct(ex.id, {stock:csv.stock, in_sortiment:true});
+      ex.stock = csv.stock; ex.in_sortiment = true; count++;
+    }
+  }
+  setState({products:[...state.products]});
+  alert(`${count} Produkte aktualisiert.`);
+  e.target.value = "";
+}
+
+async function handleStockChange(id, delta) {
+  const p = state.products.find(x=>x.id===id);
+  if (!p) return;
+  const newStock = Math.max(0, p.stock + delta);
+  p.stock = newStock;
+  setState({products:[...state.products]});
+  await updateProduct(id, {stock:newStock});
+}
+
+async function handleMinStockSave(id, val) {
+  const v = Math.max(0, parseInt(val)||0);
+  const p = state.products.find(x=>x.id===id);
+  if (p) { p.min_stock = v; setState({products:[...state.products],editingMin:null}); }
+  await updateProduct(id, {min_stock:v});
+}
+
+async function handleToggleAvail(id) {
+  const p = state.products.find(x=>x.id===id);
+  if (!p) return;
+  p.not_available = !p.not_available;
+  setState({products:[...state.products]});
+  await updateProduct(id, {not_available:p.not_available});
+}
+
+async function handleAddToSortiment(id) {
+  const p = state.products.find(x=>x.id===id);
+  if (!p) return;
+  p.in_sortiment = true; p.is_new = false;
+  setState({products:[...state.products]});
+  await updateProduct(id, {in_sortiment:true, is_new:false});
+}
+
+function toggleCart(id) {
+  const cart = {...state.cart};
+  if (cart[id]) { delete cart[id]; }
+  else {
+    const p = state.products.find(x=>x.id===id);
+    cart[id] = Math.max(1, (p?.min_stock||2) - Math.max(0, p?.stock||0));
+  }
+  setState({cart});
+}
+
+function setCartQty(id, q) {
+  setState({cart:{...state.cart,[id]:Math.max(1,parseInt(q)||1)}});
+}
+
+function autoFillCart() {
+  const cart = {};
+  state.products.filter(p=>p.in_sortiment&&!p.not_available).forEach(p=>{
+    const s = getStatus(p);
+    if (s.order<=2) cart[p.id] = Math.max(1, (p.min_stock||2) - p.stock);
+  });
+  setState({cart});
+}
+
+async function sendOrder() {
+  const items = getCartItems();
+  if (!items.length) return;
+  if (!state.settings.lieferant_phone) { alert("Bitte WhatsApp-Nummer in Einstellungen hinterlegen."); return; }
+  const url = whatsappURL(state.settings.lieferant_phone, items);
+  await createOrder(state.user.id, items);
+  const orders = await loadOrders();
+  window.open(url, "_blank");
+  setState({cart:{},orders,sent:true});
+  setTimeout(()=>setState({sent:false}), 2000);
+}
+
+function getCartItems() {
+  return Object.entries(state.cart).map(([id,qty])=>{
+    const p = state.products.find(x=>String(x.id)===String(id));
+    return p ? {...p, orderQty:qty} : null;
+  }).filter(Boolean);
+}
+
+async function handleToggleOrderItem(orderId, itemId, field) {
+  const o = state.orders.find(x=>x.id===orderId);
+  if (!o) return;
+  const item = o.items.find(x=>x.id===itemId);
+  if (!item) return;
+  item[field] = !item[field];
+  await updateOrderItem(itemId, {[field]:item[field]});
+  const allDone = o.items.every(i=>i.received||i.not_available);
+  if (allDone !== (o.status==="erledigt")) {
+    o.status = allDone ? "erledigt" : "bestellt";
+    await updateOrder(orderId, {status:o.status});
+  }
+  setState({orders:[...state.orders]});
+}
+
+async function handleDeleteOrder(orderId) {
+  if (!confirm("Bestellung löschen?")) return;
+  await deleteOrder(orderId);
+  setState({orders:state.orders.filter(o=>o.id!==orderId)});
+}
+
+async function handleSaveSettings() {
+  await saveSettings(state.user.id, state.settings);
+  alert("Gespeichert!");
+}
+
+async function handleResetAll() {
+  if (!confirm("Alle Produkte und Bestellungen löschen und neu laden?")) return;
+  await sb.from('order_items').delete().in('order_id', state.orders.map(o=>o.id));
+  await sb.from('orders').delete().eq('user_id', state.user.id);
+  await sb.from('products').delete().eq('user_id', state.user.id);
+  await initCatalog(state.user.id);
+  const products = await loadProducts();
+  setState({products, orders:[], cart:{}});
+}
+
+// ─── Render Functions ───
+function renderLogin() {
+  return `
+    <div class="login-box">
+      <h2>DIGORPARFUMS</h2>
+      <p>Bestelltool — Anmelden</p>
+      <input class="login-input" type="email" placeholder="E-Mail" id="loginEmail" value="${state.loginEmail}">
+      <input class="login-input" type="password" placeholder="Passwort" id="loginPassword" value="${state.loginPassword}">
+      <button class="login-btn" id="loginBtn" ${state.loginLoading?'disabled':''}>${state.loginLoading?'Laden...':'Anmelden'}</button>
+      ${state.loginError?`<div class="login-error">${state.loginError}</div>`:''}
+      <p style="margin-top:16px;font-size:11px;color:#555">Erster Login? Wird automatisch registriert.</p>
+    </div>`;
+}
+
+function renderDashboard() {
+  const active = state.products.filter(p=>p.in_sortiment&&!p.not_available);
+  const needsOrder = active.filter(p=>{const s=getStatus(p);return s.order<=2;}).length;
+  const unavail = state.products.filter(p=>p.in_sortiment&&p.not_available).length;
+  let filtered = active.filter(p=>{
+    const s = getStatus(p);
+    if (state.filter==="order"&&s.order>2) return false;
+    if (state.filter==="warn"&&s.order!==3) return false;
+    if (state.filter==="ok"&&s.order!==4) return false;
+    if (state.search) {
+      const q = state.search.toLowerCase();
+      if (!p.name.toLowerCase().includes(q)&&!(p.inspiration||"").toLowerCase().includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b)=>getStatus(a).order-getStatus(b).order);
+
+  return `
+    <div class="stats">
+      <div class="stat"><div class="stat-num" style="color:#c9a96e">${active.length}</div><div class="stat-label">Aktiv</div></div>
+      <div class="stat" style="background:${needsOrder>0?'#450a0a':'#052e16'};border:1px solid ${needsOrder>0?'#ef444444':'#22c55e44'};cursor:${needsOrder>0?'pointer':'default'}" onclick="${needsOrder>0?`setState({tab:'bestellen'})`:''}">
+        <div class="stat-num" style="color:${needsOrder>0?'#ef4444':'#22c55e'}">${needsOrder}</div><div class="stat-label" style="color:#999">Nachbestellen</div>
+      </div>
+      <div class="stat" style="background:#1a1a1a;border:1px solid #33333366"><div class="stat-num" style="color:#666">${unavail}</div><div class="stat-label" style="color:#555">Nicht lieferbar</div></div>
+    </div>
+    <div class="search-bar">
+      <input class="search-input" type="text" placeholder="Suchen..." value="${state.search}" oninput="setState({search:this.value})">
+      <input type="file" accept=".csv" id="csvFile" style="display:none" onchange="handleCSVImport(event)">
+      <button class="btn btn-gold" onclick="document.getElementById('csvFile').click()">📥 CSV</button>
+    </div>
+    <div class="chips">
+      ${["all","order","warn","ok"].map(f=>{
+        const colors = {all:"#888",order:"#ef4444",warn:"#eab308",ok:"#22c55e"};
+        const labels = {all:"Alle",order:"Bestellen",warn:"Bald",ok:"OK"};
+        return `<button class="chip ${state.filter===f?'active':''}" style="--c:${colors[f]}" onclick="setState({filter:'${f}'})">${labels[f]}</button>`;
+      }).join("")}
+    </div>
+    ${filtered.length===0?`<div class="empty">${state.products.length===0?'📥 Importier dein Shopify CSV.':'Keine Treffer'}</div>`
+    :filtered.map(p=>{
+      const s = getStatus(p);
+      return `<div class="product-row" style="border-left:3px solid ${s.color}">
+        <div style="flex:1;min-width:0">
+          <div class="product-name">${esc(p.name)}</div>
+          <div class="product-sub">
+            ${p.inspiration?`<span class="product-inspo">${esc(p.inspiration)}</span> · `:''}Min: ${state.editingMin===p.id
+              ?`<input class="min-edit" type="number" value="${p.min_stock}" autofocus onblur="handleMinStockSave(${p.id},this.value)" onkeydown="if(event.key==='Enter')handleMinStockSave(${p.id},this.value)">`
+              :`<span class="min-click" onclick="setState({editingMin:${p.id}})">${p.min_stock}</span>`}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="stock-btn" style="color:#ef4444" onclick="handleStockChange(${p.id},-1)">−</button>
+          <div class="stock-val" style="color:${s.color}">${p.stock}</div>
+          <button class="stock-btn" style="color:#22c55e" onclick="handleStockChange(${p.id},1)">+</button>
+        </div>
+        ${badge(s)}
+      </div>`;
+    }).join("")}`;
+}
+
+function renderKatalog() {
+  const newP = state.products.filter(p=>!p.in_sortiment&&!p.not_available);
+  const unavP = state.products.filter(p=>p.in_sortiment&&p.not_available);
+  const source = state.katalogView==="new"?newP:state.katalogView==="unavail"?unavP:state.products;
+  const counts = {all:source.length};
+  Object.keys(CATEGORIES).forEach(c=>{if(c!=="all")counts[c]=source.filter(p=>p.category===c).length;});
+  let filtered = source.filter(p=>{
+    if(state.katalogCategory!=="all"&&p.category!==state.katalogCategory) return false;
+    if(state.katalogSearch){const q=state.katalogSearch.toLowerCase();if(!p.name.toLowerCase().includes(q)&&!(p.inspiration||"").toLowerCase().includes(q)) return false;}
+    return true;
+  }).sort((a,b)=>a.name.localeCompare(b.name));
+
+  return `
+    <h2 style="font-size:16px;color:#c9a96e;margin-bottom:12px">Katalog</h2>
+    <div class="view-toggle">
+      ${[{id:"new",label:`Neue Düfte (${newP.length})`,c:"#c9a96e"},{id:"unavail",label:`Nicht lieferbar (${unavP.length})`,c:"#ef4444"},{id:"all",label:"Alle",c:"#888"}].map(v=>
+        `<button class="view-btn ${state.katalogView===v.id?'active':''}" style="--c:${v.c}" onclick="setState({katalogView:'${v.id}'})">${v.label}</button>`
+      ).join("")}
+    </div>
+    <input class="search-input" style="width:100%;margin-bottom:12px" type="text" placeholder="Suchen (Name oder Original)..." value="${state.katalogSearch}" oninput="setState({katalogSearch:this.value})">
+    <div class="chips">
+      ${Object.entries(CATEGORIES).map(([id,label])=>
+        `<button class="chip ${state.katalogCategory===id?'active':''}" style="--c:#c9a96e" onclick="setState({katalogCategory:'${id}'})">${label} (${counts[id]||0})</button>`
+      ).join("")}
+    </div>
+    ${filtered.length===0?`<div class="empty">${state.katalogView==="new"?"Keine neuen Düfte.":state.katalogView==="unavail"?"Alles lieferbar!":"Keine Treffer."}</div>`
+    :filtered.map(p=>`
+      <div class="product-row" style="border-left:3px solid ${p.is_new?'#c9a96e':p.not_available?'#ef4444':'transparent'};opacity:${p.not_available?0.6:1}">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="product-name" style="${p.not_available?'text-decoration:line-through;color:#666':''}">${esc(p.name)}</span>
+            ${p.is_new?'<span class="new-badge">NEU</span>':''}
+            ${p.in_sortiment&&!p.not_available?'<span class="sortiment-badge">IM SORTIMENT</span>':''}
+          </div>
+          <div style="font-size:11px;color:#887755;margin-top:2px">${esc(p.inspiration||'')}</div>
+          <div style="font-size:10px;color:#555;margin-top:1px">${CATEGORIES[p.category]||p.category}${p.in_sortiment?` · Lager: ${p.stock}`:''}</div>
+        </div>
+        ${!p.in_sortiment&&!p.not_available
+          ?`<button class="btn btn-gold" style="font-size:10px;padding:5px 10px" onclick="handleAddToSortiment(${p.id})">+ Sortiment</button>`
+          :p.in_sortiment
+          ?`<button class="btn" style="font-size:10px;padding:4px 8px;border:1px solid ${p.not_available?'#22c55e44':'#ef444444'};background:${p.not_available?'#052e1666':'#450a0a66'};color:${p.not_available?'#22c55e':'#ef4444'}" onclick="handleToggleAvail(${p.id})">${p.not_available?'Wieder verfügbar':'Nicht lieferbar'}</button>`
+          :''}
+      </div>
+    `).join("")}`;
+}
+
+function renderBestellen() {
+  const orderable = state.products.filter(p=>p.in_sortiment&&!p.not_available).sort((a,b)=>getStatus(a).order-getStatus(b).order);
+  const needsOrder = orderable.filter(p=>getStatus(p).order<=2);
+  const items = getCartItems();
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="font-size:16px;color:#c9a96e;margin:0">Neue Bestellung</h2>
+      ${needsOrder.length>0?`<button class="btn btn-red" style="font-size:11px" onclick="autoFillCart()">⚡ ${needsOrder.length} nachfüllen</button>`:''}
+    </div>
+    <div style="margin-bottom:16px">
+      ${orderable.map(p=>{
+        const inCart = state.cart[p.id]!==undefined;
+        const s = getStatus(p);
+        return `<div class="cart-item ${inCart?'selected':''}" onclick="toggleCart(${p.id})">
+          <div class="checkbox ${inCart?'checked':''}">${inCart?'✓':''}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</div>
+            <div style="font-size:11px;color:#666"><span class="product-inspo">${esc(p.inspiration||'')}</span> · Lager: ${p.stock} | Min: ${p.min_stock}</div>
+          </div>
+          ${inCart?`<div class="qty-control" onclick="event.stopPropagation()">
+            <button class="qty-btn" onclick="setCartQty(${p.id},${(state.cart[p.id]||1)-1})">−</button>
+            <input class="qty-input" type="number" value="${state.cart[p.id]}" onchange="setCartQty(${p.id},this.value)">
+            <button class="qty-btn" onclick="setCartQty(${p.id},${(state.cart[p.id]||1)+1})">+</button>
+          </div>`:''}
+          ${badge(s,true)}
+        </div>`;
+      }).join("")}
+    </div>
+    ${items.length>0?`
+      <div class="preview-box">
+        <div class="preview-label">Vorschau WhatsApp (Französisch)</div>
+        <div class="preview-text">${esc(previewMsg(items))}</div>
+      </div>`:''}
+    <button class="btn btn-green" style="width:100%;padding:14px;font-size:15px;font-weight:700;${items.length===0?'background:#333;color:#666;cursor:default':''}" onclick="${items.length>0?'sendOrder()':''}" ${items.length===0?'disabled':''}>
+      ${state.sent?'✓ Gesendet!':`WhatsApp senden (${items.length} Produkte)`}
+    </button>`;
+}
+
+function renderHistorie() {
+  if (!state.orders.length) return `<div class="empty"><div style="font-size:32px;margin-bottom:12px">📋</div>Noch keine Bestellungen.</div>`;
+  return `
+    <h2 style="font-size:16px;color:#c9a96e;margin:0 0 16px">Bestellhistorie</h2>
+    ${state.orders.map(o=>{
+      const date = new Date(o.order_date).toLocaleDateString("de-CH");
+      const rec = (o.items||[]).filter(i=>i.received).length;
+      const exp = state.expandedOrder===o.id;
+      return `<div class="order-card">
+        <div class="order-header" onclick="setState({expandedOrder:${exp?'null':o.id}})">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:#ddd">${date}</div>
+            <div style="font-size:11px;color:#666">${(o.items||[]).length} Produkte · ${rec}/${(o.items||[]).length} erhalten</div>
+          </div>
+          <span class="badge" style="background:${o.status==="erledigt"?'#052e16':'#422006'};color:${o.status==="erledigt"?'#22c55e':'#eab308'}">${o.status==="erledigt"?'✓ Erledigt':'⏳ Offen'}</span>
+          <span style="color:#555;font-size:12px">${exp?'▲':'▼'}</span>
+        </div>
+        ${exp?`<div class="order-body">
+          ${(o.items||[]).map((item,idx)=>`
+            <div class="order-item" style="border-bottom:${idx<(o.items||[]).length-1?'1px solid #1a1a1a':'none'}">
+              <div style="flex:1;font-size:12px;color:${item.not_available?'#666':item.received?'#22c55e':'#ddd'};text-decoration:${item.not_available?'line-through':'none'}">${esc(item.name)} × ${item.qty}</div>
+              <button class="btn" style="padding:3px 8px;font-size:10px;border:1px solid ${item.received?'#22c55e':'#444'};background:${item.received?'#052e16':'transparent'};color:${item.received?'#22c55e':'#888'}" onclick="handleToggleOrderItem(${o.id},${item.id},'received')">✓</button>
+              <button class="btn" style="padding:3px 8px;font-size:10px;border:1px solid ${item.not_available?'#ef4444':'#444'};background:${item.not_available?'#450a0a':'transparent'};color:${item.not_available?'#ef4444':'#888'}" onclick="handleToggleOrderItem(${o.id},${item.id},'not_available')">✕</button>
+            </div>`).join("")}
+          <button class="btn btn-ghost" style="margin-top:8px;font-size:11px" onclick="handleDeleteOrder(${o.id})">Löschen</button>
+        </div>`:''}
+      </div>`;
+    }).join("")}`;
+}
+
+function renderSettings() {
+  const s = state.settings;
+  return `
+    <h2 style="font-size:16px;color:#c9a96e;margin:0 0 20px">Einstellungen</h2>
+    <div style="margin-bottom:16px">
+      <label class="setting-label">Lieferant Name</label>
+      <input class="setting-input" type="text" value="${esc(s.lieferant_name)}" onchange="state.settings.lieferant_name=this.value">
+    </div>
+    <div style="margin-bottom:16px">
+      <label class="setting-label">WhatsApp-Nummer (z.B. 33612345678)</label>
+      <input class="setting-input" type="tel" placeholder="33612345678" value="${esc(s.lieferant_phone)}" onchange="state.settings.lieferant_phone=this.value">
+    </div>
+    <div style="margin-bottom:16px">
+      <label class="setting-label">Standard-Mindestbestand</label>
+      <input class="setting-input" type="number" style="width:80px" value="${s.default_min_stock}" onchange="state.settings.default_min_stock=parseInt(this.value)||1">
+    </div>
+    <button class="btn btn-gold" style="width:100%;padding:12px;font-size:14px;margin-bottom:12px" onclick="handleSaveSettings()">Speichern</button>
+    <hr style="border:none;border-top:1px solid #222;margin:16px 0">
+    <button class="btn btn-ghost" style="width:100%;margin-bottom:8px" onclick="handleExportCSV()">Katalog als CSV exportieren</button>
+    <button class="btn btn-red" style="width:100%;margin-bottom:8px" onclick="handleResetAll()">Alle Daten zurücksetzen</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="handleLogout()">Abmelden</button>
+    <div style="font-size:11px;color:#444;margin-top:16px;text-align:center">
+      DigorParfums Bestelltool v3.0<br>Katalog: Les Parfums D'Igor (März 2026)<br>
+      Angemeldet: ${esc(state.user?.email||'')}
+    </div>`;
+}
+
+function handleExportCSV() {
+  const csv = ["Produktname,Inspiration,Kategorie,Lagerbestand,Mindestbestand,Im Sortiment,Nicht lieferbar"]
+    .concat(state.products.map(p=>`"${p.name}","${p.inspiration||''}","${p.category||''}",${p.stock},${p.min_stock},${p.in_sortiment?'ja':'nein'},${p.not_available?'ja':'nein'}`)).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = `DigorParfums_Katalog_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ─── Main Render ───
+function render() {
+  const app = $('#app');
+  if (state.loading) { app.innerHTML = `<div class="loading">Laden...</div>`; return; }
+  if (!state.user) { app.innerHTML = renderLogin(); bindLogin(); return; }
+
+  const tabs = [{id:"dashboard",label:"Lager",icon:"📦"},{id:"katalog",label:"Katalog",icon:"🧴"},{id:"bestellen",label:"Bestellen",icon:"🛒"},{id:"historie",label:"Historie",icon:"📋"},{id:"settings",label:"⚙️",icon:""}];
+
+  let content = "";
+  if (state.tab==="dashboard") content = renderDashboard();
+  else if (state.tab==="katalog") content = renderKatalog();
+  else if (state.tab==="bestellen") content = renderBestellen();
+  else if (state.tab==="historie") content = renderHistorie();
+  else if (state.tab==="settings") content = renderSettings();
+
+  app.innerHTML = `
+    <div class="header">
+      <h1>DIGORPARFUMS</h1>
+      <p>Bestelltool v3.0</p>
+    </div>
+    <div class="tabs">
+      ${tabs.map(t=>`<button class="tab ${state.tab===t.id?'active':''}" onclick="setState({tab:'${t.id}'})">${t.icon} ${t.label}</button>`).join("")}
+    </div>
+    <div class="content">${content}</div>`;
+}
+
+function bindLogin() {
+  const emailEl = $('#loginEmail');
+  const passEl = $('#loginPassword');
+  const btnEl = $('#loginBtn');
+  if (emailEl) emailEl.addEventListener('input', e=>state.loginEmail=e.target.value);
+  if (passEl) passEl.addEventListener('input', e=>state.loginPassword=e.target.value);
+  if (passEl) passEl.addEventListener('keydown', e=>{if(e.key==='Enter')handleLogin();});
+  if (btnEl) btnEl.addEventListener('click', handleLogin);
+}
+
+// ─── Init ───
+async function init() {
+  const {data:{session}} = await sb.auth.getSession();
+  if (session?.user) { await initApp(session.user); }
+  else { setState({loading:false}); }
+}
+
+init();
+</script>
+</body>
+</html>
